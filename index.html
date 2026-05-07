@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>在线答题测试 | 知识挑战</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f5f7fc 0%, #eef2f5 100%);
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            padding: 2rem 1.5rem;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 主卡片容器 */
+        .quiz-container {
+            max-width: 950px;
+            width: 100%;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 2rem;
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.25), 0 8px 18px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+
+        /* 头部区域 */
+        .quiz-header {
+            background: #1f2b3c;
+            color: white;
+            padding: 1.5rem 2rem;
+            border-bottom: 5px solid #ffb347;
+        }
+
+        .quiz-header h1 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .quiz-header h1:before {
+            content: "📋";
+            font-size: 2rem;
+        }
+
+        .quiz-header p {
+            margin-top: 0.6rem;
+            opacity: 0.85;
+            font-size: 0.95rem;
+        }
+
+        /* 进度&得分栏 */
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            background: #f8fafd;
+            padding: 0.9rem 2rem;
+            border-bottom: 1px solid #e2e8f0;
+            font-weight: 600;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .question-counter {
+            background: #e9edf2;
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            color: #1f2b3c;
+        }
+
+        .score-area {
+            background: #ffecce;
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            color: #b45f1b;
+            font-size: 1rem;
+        }
+
+        .score-area span {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #e67e22;
+        }
+
+        /* 题目区域 */
+        .question-area {
+            padding: 2rem 2rem 1rem 2rem;
+        }
+
+        .question-text {
+            font-size: 1.6rem;
+            font-weight: 600;
+            line-height: 1.35;
+            color: #0a1c2f;
+            margin-bottom: 2rem;
+            border-left: 5px solid #ffb347;
+            padding-left: 1.2rem;
+        }
+
+        /* 选项列表 (网格布局更好看) */
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .option-item {
+            background: #f9fbfd;
+            border: 2px solid #e2edf7;
+            border-radius: 1.2rem;
+            transition: all 0.2s;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            padding: 0.9rem 1.2rem;
+        }
+
+        .option-item:hover {
+            background: #f1f7fe;
+            border-color: #ffb347;
+            transform: translateX(4px);
+        }
+
+        /* 单选圆圈自定义 */
+        .option-radio {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            border: 2px solid #bdd4e7;
+            border-radius: 50%;
+            margin-right: 1rem;
+            position: relative;
+            cursor: pointer;
+            background: white;
+            flex-shrink: 0;
+            transition: 0.1s;
+        }
+
+        .option-radio:checked {
+            border-color: #e67e22;
+            background-color: #e67e22;
+            box-shadow: inset 0 0 0 4px white;
+        }
+
+        .option-radio:focus {
+            outline: none;
+        }
+
+        .option-text {
+            font-size: 1.05rem;
+            font-weight: 500;
+            color: #1e2f3e;
+            line-height: 1.4;
+            flex: 1;
+        }
+
+        /* 按钮区域 */
+        .action-buttons {
+            padding: 0.5rem 2rem 2rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background: #1f2b3c;
+            border: none;
+            padding: 0.8rem 1.6rem;
+            border-radius: 3rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: white;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        button i {
+            font-style: normal;
+            font-weight: normal;
+        }
+
+        button:hover:not(:disabled) {
+            background: #ff8c1a;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(230, 126, 34, 0.2);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        button:disabled {
+            background: #b9c2cc;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .reset-btn {
+            background: #5c6f87;
+        }
+
+        .reset-btn:hover:not(:disabled) {
+            background: #3c4b62;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .next-btn {
+            background: #e67e22;
+            padding: 0.8rem 2rem;
+        }
+
+        .submit-area {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .submit-btn {
+            background: #27ae60;
+            font-size: 1rem;
+            padding: 0.9rem 2rem;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            background: #2ecc71;
+        }
+
+        /* 结果卡牌 */
+        .result-card {
+            margin: 1rem 2rem 2rem 2rem;
+            background: #eef6ef;
+            border-radius: 1.5rem;
+            padding: 1.2rem 1.8rem;
+            border-left: 8px solid #2ecc71;
+            animation: fadeSlideUp 0.3s ease;
+        }
+
+        .result-card h3 {
+            color: #1f6e43;
+            margin-bottom: 0.5rem;
+            font-size: 1.3rem;
+        }
+
+        .result-card p {
+            font-size: 1rem;
+            color: #2c5a2e;
+        }
+
+        .result-detail {
+            font-size: 0.9rem;
+            margin-top: 10px;
+            color: #2d4a22;
+            background: white;
+            padding: 0.7rem;
+            border-radius: 1rem;
+        }
+
+        @keyframes fadeSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 移动端优化 */
+        @media (max-width: 600px) {
+            body {
+                padding: 1rem;
+            }
+            .question-text {
+                font-size: 1.3rem;
+            }
+            .option-text {
+                font-size: 0.95rem;
+            }
+            .action-buttons {
+                padding: 0.5rem 1.2rem 1.8rem 1.2rem;
+            }
+            .question-area {
+                padding: 1.5rem 1.2rem;
+            }
+        }
+
+        footer {
+            text-align: center;
+            font-size: 0.75rem;
+            padding: 1rem 0 1rem 0;
+            color: #8ba0b5;
+            border-top: 1px solid #eef2f5;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container" id="quizApp">
+    <div class="quiz-header">
+        <h1>知识挑战 · 答题闯关</h1>
+        <p>每题只有一个正确答案，答完可查看总分与反馈</p>
+    </div>
+
+    <div class="stats-bar">
+        <div class="question-counter" id="counterDisplay">第1 / 5题</div>
+        <div class="score-area">🏆 当前得分: <span id="currentScoreSpan">0</span> / <span id="totalScoreSpan">5</span></div>
+    </div>
+
+    <div class="question-area" id="questionArea">
+        <div class="question-text" id="questionText">加载题目中...</div>
+        <div class="options-list" id="optionsContainer"></div>
+    </div>
+
+    <div class="action-buttons">
+        <button class="reset-btn" id="resetBtn">⟳ 重新答题</button>
+        <button class="next-btn" id="nextBtn">下一题 →</button>
+    </div>
+
+    <div id="submitBtnContainer" class="submit-area">
+        <!-- 最后一题时动态展示提交按钮或正常的下一题逻辑 -->
+    </div>
+    <div id="resultArea"></div>
+    <footer>📌 共5题 | 点击选项即可选中答案，所有题目完成后自动计算总分</footer>
+</div>
+
+<script>
+    // ---------- 题库 ----------
+    const QUIZ_DATA = [
+        {
+            text: "1. 下列哪个是 JavaScript 中声明变量的正确方式？",
+            options: ["var name;", "let name;", "const name;", "以上都是"],
+            correct: 3   // 索引从0开始，对应 "以上都是"
+        },
+        {
+            text: "2. 在 HTML 中，哪个标签用于引入外部 JavaScript 文件？",
+            options: ["<js>", "<script>", "<javascript>", "<code>"],
+            correct: 1   // <script>
+        },
+        {
+            text: "3. 以下哪个 CSS 属性可以更改文本颜色？",
+            options: ["text-color", "color", "font-color", "bgcolor"],
+            correct: 1   // color
+        },
+        {
+            text: "4. 以下哪个是 Git 版本控制系统托管平台（可用于 GitHub Pages）？",
+            options: ["GitLab", "Bitbucket", "GitHub", "以上都是"],
+            correct: 3   // 以上都是
+        },
+        {
+            text: "5. 想在 GitHub Pages 上展示一个自定义域名，需要在仓库根目录放置什么文件？",
+            options: ["CNAME", "DOMAIN", "config.yml", "index.html"],
+            correct: 0   // CNAME 文件
+        }
+    ];
+
+    const TOTAL_QS = QUIZ_DATA.length;
+
+    // 应用状态
+    let currentIndex = 0;               // 当前第几题 (0索引)
+    let userAnswers = new Array(TOTAL_QS).fill(null);   // 存储每道题选中的选项索引，初始null表示未选
+    let quizFinished = false;            // 是否已经提交/完成所有题目(显示成绩界面)
+    
+    // DOM 元素
+    const questionTextEl = document.getElementById("questionText");
+    const optionsContainer = document.getElementById("optionsContainer");
+    const counterDisplay = document.getElementById("counterDisplay");
+    const currentScoreSpan = document.getElementById("currentScoreSpan");
+    const totalScoreSpan = document.getElementById("totalScoreSpan");
+    const nextBtn = document.getElementById("nextBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const submitBtnContainer = document.getElementById("submitBtnContainer");
+    const resultArea = document.getElementById("resultArea");
+
+    // 辅助函数 : 计算当前得分
+    function computeCurrentScore() {
+        let score = 0;
+        for (let i = 0; i < TOTAL_QS; i++) {
+            if (userAnswers[i] !== null && userAnswers[i] === QUIZ_DATA[i].correct) {
+                score++;
+            }
+        }
+        return score;
+    }
+
+    // 更新头部得分显示
+    function updateScoreDisplay() {
+        const currentScore = computeCurrentScore();
+        currentScoreSpan.innerText = currentScore;
+        totalScoreSpan.innerText = TOTAL_QS;
+    }
+
+    // 渲染当前题目 (根据 currentIndex)
+    function renderCurrentQuestion() {
+        if (quizFinished) {
+            // 如果已经完成所有答题并显示结果，不再渲染题目区域
+            return;
+        }
+        const question = QUIZ_DATA[currentIndex];
+        if (!question) return;
+        
+        // 设置题目文本
+        questionTextEl.innerText = question.text;
+        
+        // 生成选项html
+        const optionsHtml = question.options.map((opt, idx) => {
+            const isChecked = (userAnswers[currentIndex] === idx);
+            const checkedAttr = isChecked ? 'checked' : '';
+            // 为了保证每组radio互斥，name用当前题目索引
+            return `
+                <label class="option-item" data-opt-index="${idx}">
+                    <input type="radio" name="q${currentIndex}" value="${idx}" class="option-radio" ${checkedAttr}>
+                    <span class="option-text">${escapeHtml(opt)}</span>
+                </label>
+            `;
+        }).join('');
+        
+        optionsContainer.innerHTML = optionsHtml;
+        
+        // 绑定每个选项的change事件 (通过事件委托或者单独绑定，这里用委托方式)
+        // 为了避免重复绑定，我们直接在容器上监听change事件
+        // 注意: 下面会统一挂载事件,但要先移除旧监听避免重复? 我们用全局委托即可，重新渲染后事件自然有效。
+        
+        // 更新counter显示
+        counterDisplay.innerText = `第${currentIndex+1} / ${TOTAL_QS}题`;
+        
+        // 更新按钮状态: 下一题按钮样式，判断如果是最后一题则显示"完成并查看结果"，否则显示下一题
+        if (currentIndex === TOTAL_QS - 1) {
+            // 最后一题: 显示“提交答卷”大按钮，并隐藏原来的nextBtn? 但为了UI一致，可以显示一个绿色提交按钮在额外区域，同时隐藏原有的nextBtn区域？
+            // 为了符合直觉：最后一题时，把原来的nextBtn隐藏，在submitBtnContainer中显示"✅ 提交答卷"按钮。
+            nextBtn.style.display = "none";
+            submitBtnContainer.innerHTML = `<button class="submit-btn" id="submitQuizBtn">📝 提交答卷 & 查看成绩</button>`;
+            const submitQuizBtn = document.getElementById("submitQuizBtn");
+            if (submitQuizBtn) {
+                // 移除原有监听防止重复
+                const newSubmitBtn = submitQuizBtn.cloneNode(true);
+                submitQuizBtn.parentNode.replaceChild(newSubmitBtn, submitQuizBtn);
+                newSubmitBtn.addEventListener("click", finishQuizAndShowResult);
+            }
+        } else {
+            // 非最后一题: 显示nextBtn, 清空submit容器
+            nextBtn.style.display = "flex";
+            submitBtnContainer.innerHTML = "";
+        }
+        
+        // 保证重置后没有残留结果区域（如果重置时已经finished，也要清理）
+        if (!quizFinished) {
+            // 如果尚未完成，结果区域应该隐藏或清空，避免混叠
+            if(resultArea.innerHTML !== "") {
+                resultArea.innerHTML = "";
+            }
+        }
+        
+        // 更新得分显示 (每次重绘时得分可能因之前的改动而变)
+        updateScoreDisplay();
+    }
+    
+    // 简单的防XSS
+    function escapeHtml(str) {
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
+            return c;
+        });
+    }
+    
+    // 处理选项更改（监听选项点击/radio变化）
+    function handleOptionChange(event) {
+        if (quizFinished) return; // 答题结束后不允许改动
+        
+        let targetInput = null;
+        if (event.target.classList && event.target.classList.contains('option-radio')) {
+            targetInput = event.target;
+        } else if (event.target.parentElement && event.target.parentElement.querySelector('.option-radio')) {
+            // 可能点击的是label区域
+            const label = event.target.closest('.option-item');
+            if (label) {
+                const radio = label.querySelector('.option-radio');
+                if (radio) targetInput = radio;
+            }
+        }
+        
+        if (!targetInput) return;
+        
+        const selectedValue = parseInt(targetInput.value, 10);
+        if (isNaN(selectedValue)) return;
+        
+        // 保存当前题目所选答案 (索引)
+        const previousAnswer = userAnswers[currentIndex];
+        userAnswers[currentIndex] = selectedValue;
+        
+        // 如果之前答案和现在不同，得分可能改变，需要更新
+        updateScoreDisplay();
+        
+        // 可选: 改变选项样式反馈，已经由radio的checked表现完成。
+        // 由于重新渲染会重新生成，但这里不需要重新渲染整个题目? 为了更好的交互可以只更新radio状态，
+        // 但因为我们已经手动改变了radio的checked属性，并且userAnswers已保存，所以无需重新渲染整个题目避免闪烁。
+        // 但是为了同步UI上的“选中样式”，当前已经通过原生的input更改已经足够。 如果用户通过label点按，上面的操作已经设置radio为选中。
+        // 不过注意因为是直接操作radio，它的checked已经被浏览器标记，不需要额外动作。
+        // 但有一个小问题：如果我们重新渲染了题目，会导致事件丢失，但这里并未重新渲染，直接修改dom是合理的。
+        // 这样交互更流畅。
+        // 确保其他同组radio未选中，因为原生radio自动互斥，好。
+    }
+    
+    // 切换下一题
+    function goToNextQuestion() {
+        if (quizFinished) return;
+        // 检查当前题目是否已经作答，若未作答，给出轻提示但不强制阻塞？用户体验上也可以允许跳过，但最好提示一下
+        if (userAnswers[currentIndex] === null) {
+            // 小小提醒但不强制拦截，更友好，但也可以提示. 我们加一个非阻塞提醒
+            const reminder = document.createElement("div");
+            reminder.textContent = "⚠️ 当前题目未作答，可以留空继续，但无法得分哟";
+            reminder.style.cssText = "color:#e67e22; background:#fff3e0; padding:8px 16px; border-radius:40px; margin-bottom:12px; text-align:center; font-size:0.85rem;";
+            const existingReminder = document.querySelector(".temp-reminder");
+            if(existingReminder) existingReminder.remove();
+            reminder.classList.add("temp-reminder");
+            optionsContainer.parentNode.insertBefore(reminder, optionsContainer.nextSibling);
+            setTimeout(() => {
+                if(reminder && reminder.remove) reminder.remove();
+            }, 1800);
+        }
+        
+        if (currentIndex + 1 < TOTAL_QS) {
+            currentIndex++;
+            renderCurrentQuestion();
+        } else {
+            // 理论上已经不会触发，因为最后一题按钮被替换了，但防止边界
+            if(currentIndex === TOTAL_QS-1) {
+                finishQuizAndShowResult();
+            }
+        }
+    }
+    
+    // 完成全部题目并展示结果 (最终结算)
+    function finishQuizAndShowResult() {
+        if (quizFinished) return;
+        
+        // 检查是否所有题目都已答？ 可能有些题目未选，但不强制，未选的自动算错。
+        // 计算最终得分
+        const finalScore = computeCurrentScore();
+        const percentage = Math.round((finalScore / TOTAL_QS) * 100);
+        
+        // 构建详细答题反馈列表
+        let detailsHtml = `<div class="result-detail"><strong>📖 详细解析：</strong><ul style="margin-top:8px; list-style-type: none; padding-left: 0;">`;
+        for (let i = 0; i < TOTAL_QS; i++) {
+            const q = QUIZ_DATA[i];
+            const userChoice = userAnswers[i];
+            const isCorrect = (userChoice !== null && userChoice === q.correct);
+            const correctAnswerText = q.options[q.correct];
+            const userAnswerText = (userChoice !== null) ? q.options[userChoice] : "未作答";
+            const statusIcon = isCorrect ? "✅" : "❌";
+            detailsHtml += `
+                <li style="margin-bottom: 12px; border-bottom: 1px solid #e0ddc0; padding-bottom: 6px;">
+                    <span style="font-weight:600;">${statusIcon} ${escapeHtml(q.text)}</span><br>
+                    <span style="font-size: 0.85rem;">&nbsp;&nbsp;你的答案: ${escapeHtml(userAnswerText)} &nbsp; | &nbsp;正确答案: ${escapeHtml(correctAnswerText)}</span>
+                </li>
+            `;
+        }
+        detailsHtml += `</ul></div>`;
+        
+        let message = "";
+        let emoji = "";
+        if (finalScore === TOTAL_QS) {
+            message = "完美满分！ 知识达人就是你 🎉🎉🎉";
+            emoji = "🏅";
+        } else if (finalScore >= TOTAL_QS-2) {
+            message = "成绩优秀！ 再巩固一下就是大神啦 🌟";
+            emoji = "📚";
+        } else if (finalScore >= TOTAL_QS/2) {
+            message = "还不错哟，再复习一次冲击高分 💪";
+            emoji = "✨";
+        } else {
+            message = "再接再厉！多练习会越来越强 🚀";
+            emoji = "🌱";
+        }
+        
+        const resultHtml = `
+            <div class="result-card">
+                <h3>${emoji} 答题完成！ ${message}</h3>
+                <p>🎯 最终得分：${finalScore} / ${TOTAL_QS}  &nbsp;&nbsp; (正确率 ${percentage}%)</p>
+                ${detailsHtml}
+                <p style="margin-top: 12px; font-style:italic;">⭐ 点击「重新答题」可再次挑战~</p>
+            </div>
+        `;
+        
+        resultArea.innerHTML = resultHtml;
+        quizFinished = true;
+        
+        // 禁用选项点击效果（在事件拦截里已经判断quizFinished为true时忽略改动）
+        // 更改界面按钮外观，同时禁用“下一题/提交”相关按钮, 显示重置按钮可用。
+        nextBtn.style.display = "none";
+        submitBtnContainer.innerHTML = "";   // 清空提交区域
+        // 但我们需要禁用所有radio的修改（通过全局监听，已经通过quizFinished变量阻止了修改userAnswers）
+        // 另外给所有现有的radio添加disabled属性？为了更好的体验，让所有选项不可改
+        const allRadios = document.querySelectorAll('.option-radio');
+        allRadios.forEach(radio => radio.disabled = true);
+        
+        // 同时也要让计数器或得分显示不再变化 (已经定格)
+        // 更新得分显示最后一次 (最终成绩) 原本就正确
+        updateScoreDisplay();
+    }
+    
+    // 重置整个测验
+    function resetQuiz() {
+        // 重置状态
+        currentIndex = 0;
+        userAnswers = new Array(TOTAL_QS).fill(null);
+        quizFinished = false;
+        
+        // 清除结果显示区域
+        resultArea.innerHTML = "";
+        
+        // 重新渲染第一题
+        renderCurrentQuestion();
+        
+        // 确保所有选项之前可能被禁用，重新渲染后全部恢复可交互
+        // 同时确保得分显示重置
+        updateScoreDisplay();
+        
+        // 额外确保nextBtn显示正确 (因为reset时可能当前在最后一题状态重置), renderCurrentQuestion内部已处理按钮显示
+        // 但是如果有全局禁用radio的情况, 重新渲染会自动生成新的radio, 没有被禁用，完美
+        // 如果之前提交完成后部分radio被禁用，重新渲染后全部刷新为有效的新的radio节点，事件委托仍然有效。
+        // 需要重新绑定事件？由于监听器绑定在父容器上，依然生效，不需要额外操作。
+    }
+    
+    // 初始化事件绑定 (事件委托)
+    function bindGlobalEvents() {
+        // 监听选项变化: 通过容器，change事件
+        optionsContainer.addEventListener("change", function(e) {
+            if (quizFinished) return;
+            if (e.target && e.target.classList.contains('option-radio')) {
+                const selectedVal = parseInt(e.target.value, 10);
+                if (!isNaN(selectedVal)) {
+                    userAnswers[currentIndex] = selectedVal;
+                    updateScoreDisplay();
+                }
+            }
+        });
+        
+        // 为了防止点击标签时也发生双重事件，但change只触发一次，完美。同时我们增强对label点击可视化不会出错。
+        // 另外为了用户点击整个卡片都能选中，增加点击card区域代理
+        optionsContainer.addEventListener("click", function(e) {
+            if (quizFinished) return;
+            const labelItem = e.target.closest('.option-item');
+            if (labelItem && !e.target.classList.contains('option-radio')) {
+                const radio = labelItem.querySelector('.option-radio');
+                if (radio && !radio.checked) {
+                    radio.checked = true;
+                    // 手动触发change事件
+                    const changeEvent = new Event('change', { bubbles: true });
+                    radio.dispatchEvent(changeEvent);
+                }
+            }
+        });
+        
+        // 下一题按钮
+        nextBtn.addEventListener("click", goToNextQuestion);
+        // 重置按钮
+        resetBtn.addEventListener("click", resetQuiz);
+    }
+    
+    // 启动应用
+    function init() {
+        bindGlobalEvents();
+        renderCurrentQuestion();
+        updateScoreDisplay();
+    }
+    
+    init();
+</script>
+</body>
+</html>
