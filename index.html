@@ -181,16 +181,14 @@
         }
         
         /* 独立结果页面样式 (全屏只显示结果) */
-        .result-only {
-            max-width: 780px;
-            margin: 2rem auto;
-        }
         .result-card {
             background: linear-gradient(115deg, #fff9ef, #fff6e8);
             border-radius: 2rem;
             padding: 2rem 1.8rem;
             border-left: 8px solid #c7a252;
             box-shadow: 0 20px 35px -10px rgba(0,0,0,0.2);
+            max-width: 780px;
+            margin: 0 auto;
         }
         .jade-badge {
             font-size: 2rem;
@@ -224,6 +222,26 @@
             border-radius: 2rem;
             padding: 0.3rem 1.2rem;
             font-size: 0.85rem;
+        }
+        .culture-section {
+            background: #f0ebd8;
+            border-radius: 1.5rem;
+            padding: 1rem 1.2rem;
+            margin: 1rem 0 0.5rem;
+            border-left: 4px solid #c7a252;
+        }
+        .culture-section h4 {
+            font-size: 0.95rem;
+            color: #5a3e28;
+            margin-bottom: 0.4rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .culture-section p {
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: #4a3a28;
         }
         .retry-btn {
             background: #b27d40;
@@ -277,7 +295,7 @@
         </div>
     </div>
 
-    <!-- 独立结果容器 (初始为空且隐藏样式由单独管理) -->
+    <!-- 独立结果容器 (初始为空) -->
     <div id="resultContainer" style="display: none;"></div>
 </div>
 
@@ -372,7 +390,7 @@
         return "强烈";
     }
 
-    // ---------- 玉石映射 + 对应图片路径  ----------
+    // ---------- 玉石映射 + 对应图片路径 + 详细文化介绍 ----------
     const JADE_IMG_MAP = {
         "和田玉": "images/hetianyu.png",
         "翡翠": "images/feicui.png",
@@ -380,6 +398,34 @@
         "玛瑙": "images/manao.png",
         "琥珀": "images/hupo.png",
         "独山玉": "images/dushanyu.png"
+    };
+    
+    // 玉石文化库 (包含历史、寓意、传统)
+    const JADE_CULTURE = {
+        "和田玉": { 
+            title: "🏔️ 帝王之玉 · 和田玉",
+            content: "外貌上，和田玉质地温润细腻，呈油脂或蜡状光泽，半透明至不透明。颜色丰富，以白色为主，尤以“羊脂白玉”最为名贵，另有青、黄、墨等色。其硬度较高，韧性极强，适于精雕细琢。历史极为悠久，早在新石器时代即被先民使用，商周时期已大量开采，汉代丝绸之路开通后更成为东西方交流的重要商品。文化底蕴深厚，是中国“四大名玉”之首，被尊为“国玉”。儒家将其“温润而泽”的特性比作仁、义、智、勇等君子之德，故有“君子比德于玉”之说。历代皇室与文人雅士皆以佩玉为尚，玉器不仅是礼器、饰品，更承载着祈福、辟邪与身份象征的精神功能。"
+        },
+        "翡翠": { 
+            title: "🐉 东方瑰宝 · 翡翠",
+            content: "外貌上，翡翠是一种硬玉矿物集合体，呈玻璃光泽至油脂光泽，半透明至不透明。颜色丰富，以绿色为贵，分为帝王绿、苹果绿等，另有白、紫、红、黄、黑等色。质地细腻坚韧，硬度较高，结构常见纤维交织状。历史相对年轻，明代中期由缅甸传入中国，清代因乾隆、慈禧等皇室推崇而迅速盛行，成为传统玉文化的后起之秀。文化底蕴深厚，翡翠集中体现了“玉文化”的世俗美学与财富象征。其绿色象征生机与富贵，紫色象征祥瑞，红色代表喜庆。翡翠雕刻多采用谐音或隐喻题材（如福豆、如意、貔貅），寄托升官发财、多子多福等美好愿望。在华人世界，翡翠不仅是首饰，更被视为传家之宝，凝聚家族情感。"
+        },
+        "青金石": { 
+            title: "🌌 天光石 · 青金石",
+            content: "外貌上，青金石为不透明至半透明的岩石，呈深蓝色、紫蓝色或天青色，常有金色黄铁矿星点（称为“金”），质地细腻时可呈现均匀的纯色块体，具有玻璃至油脂光泽。历史极为古老，早在公元前7000年的中亚地区即被开采。古埃及将其视为圣石，用于制作法老面具、圣甲虫护身符；古代两河流域与波斯亦以青金石为珍贵颜料与宝石。文化底蕴深厚，在中国，青金石自古被称为“璆琳”“金碧”，汉代通过丝绸之路传入，多用于制作朝珠、翎管、摆件及佛教器物。清代因皇帝崇尚藏传佛教，青金石被定为四品官服朝珠材质，象征天威与权威。佛教中青金石以其深蓝色对应“药师佛”身色，有祛病护身之寓意。"
+        },
+        "玛瑙": { 
+            title: "🎨 巧思之玉 · 玛瑙",
+            content: "外貌上，玛瑙为玉髓类矿物，呈玻璃光泽，半透明至不透明。最典型特征为同心层状、条带状或波纹状纹理，色彩丰富，红、蓝、绿、白、黑等色常交替出现。质地坚硬致密，断口贝壳状。历史源远流长，新石器时代即被用于制作珠饰与工具。古代中国、印度、波斯、罗马均有使用，中世纪欧洲贵族将其用于镶嵌圣物盒与印章。文化底蕴丰富，在中国，玛瑙古称“琼玉”“赤玉”，佛教七宝之一，象征长寿与吉祥。因“玛瑙”谐音“马脑”，古人附会为良马之脑所化，赋予其勇猛与忠诚。玛瑙的条带纹理被解读为阴阳调和、循环往复的宇宙规律。民间常以红玛瑙为辟邪护身之物，亦多用于制作鼻烟壶、笔洗等文房雅器。"
+        },
+        "琥珀": { 
+            title: "🍂 时光胶囊 · 琥珀",
+            content: "外貌上，琥珀为非晶质有机宝石，呈树脂光泽，透明至半透明。颜色以黄色、蜜黄、棕红为主，少数有蓝、绿等罕见色。内部常见动植物包裹体（如昆虫、树叶），形成“虫珀”，极具科研与观赏价值。历史源远流长，古代北欧及中国均有使用。欧洲新石器时代遗址中即出土琥珀饰品，中国则从商代开始有琥珀制品，汉代文献明确记载其来自西域或缅甸。文化底蕴丰富，在中国被视为“虎魄”，传说为老虎魂魄入地所化，有辟邪安神之效。佛教中琥珀列为七宝之一，象征洁净与智慧。西方则自古认为琥珀能驱病辟邪，古希腊人称其为“电子之石”。"
+        },
+        "独山玉": { 
+            title: "⛰️ 中原古玉 · 独山玉",
+            content: "外貌上，独山玉质地细腻，呈玻璃光泽或油脂光泽，半透明至不透明。颜色极为丰富，有白、绿、紫、黄、红、黑等数十种色调，常多色混杂于同一块料石中，形成独特的斑驳纹理，硬度较高，韧性强。历史极为悠久，是中国“四大名玉”之一，早在新石器时代晚期即被南阳地区先民开采制作。河南南阳黄山遗址出土了大量独山玉玉器，证明其至少7000年的使用史。安阳殷墟妇好墓中也有多件独山玉制品。文化底蕴深厚，独山玉与中原文明发展紧密相连。因产自河南南阳独山，又称“南阳玉”。历代被用于制作礼器、佩饰、葬玉及生活用具。其多色特性使玉雕艺人能巧借颜色进行“俏色”创作，形成了独特的工艺传统。在民间，独山玉被认为具有辟邪护宅、吉祥如意的灵力，至今仍是中原玉文化的重要代表。"
+        }
     };
 
     function mapToJade(eiLetter, snLetter, tfLetter, jpLetter){
@@ -400,9 +446,8 @@
         return { jade: "和田玉", ...jades["和田玉"] };
     }
 
-    // 刷新界面仅显示结果 (隐藏整个测试容器，在resultContainer中展示最终卡片)
+    // 刷新界面仅显示结果 (隐藏整个测试容器，在resultContainer中展示最终卡片 + 文化介绍)
     function showResultOnly() {
-        // 计算得分、倾向
         const scores = computeDimScores();
         const ei = getLetterAndStrength(scores.EI, "E", "I");
         const sn = getLetterAndStrength(scores.SN, "S", "N");
@@ -418,10 +463,10 @@
         
         const jadeResult = mapToJade(ei.letter==="平衡"?null:ei.letter, sn.letter==="平衡"?null:sn.letter, tf.letter==="平衡"?null:tf.letter, jp.letter==="平衡"?null:jp.letter);
         const jadeImgSrc = JADE_IMG_MAP[jadeResult.jade] || "https://placehold.co/200x200?text=灵石";
+        const culture = JADE_CULTURE[jadeResult.jade] || { title: "📜 灵石文化", content: "玉乃山川之精华，中外文明都赋予其纯洁、坚韧、吉祥之意，承载着世代的人文信仰。" };
         
-        // 构建独立结果卡片HTML
         const resultHTML = `
-            <div class="result-card" style="max-width: 780px; margin: 0 auto;">
+            <div class="result-card">
                 <div style="display: flex; align-items: center; flex-wrap: wrap; justify-content: space-between; gap: 12px;">
                     <div class="jade-badge">
                         <img class="jade-image" src="${jadeImgSrc}" alt="${jadeResult.jade}" onerror="this.src='https://placehold.co/200x200?text=玉石'">
@@ -439,32 +484,32 @@
                 <p style="font-size:1.1rem; font-weight:500;">✨ 玉石寄语 ✨</p>
                 <p style="margin-top:8px; line-height:1.5;">${jadeResult.desc}</p>
                 <p style="margin-top:16px; background:#ebdfc9; border-radius:30px; padding:6px 16px; display:inline-block;">🍃 核心气质 · ${jadeResult.traits}</p>
-                <div style="margin-top: 28px; text-align: center;">
+                
+                <!-- 玉石文化专栏 (新增) -->
+                <div class="culture-section">
+                    <h4>${culture.title}</h4>
+                    <p>📖 ${culture.content}</p>
+                </div>
+                <div style="margin-top: 18px; text-align: center;">
                     <button id="retryBtnFromResult" class="btn-primary retry-btn" style="background: #5f7c4b;">🔄 重新测试</button>
                 </div>
-                <p style="margin-top: 20px; font-size:0.7rem; color:#8f7652; text-align:center;">※ 总分>0取首字母，<0取次字母，强度基于绝对值。玉石映射结合四维组合与心性格局。</p>
+                <p style="margin-top: 20px; font-size:0.7rem; color:#8f7652; text-align:center;">※ 总分>0取首字母，<0取次字母，强度基于绝对值。玉石映射结合四维组合与心性格局，文化板块来自传统文献。</p>
             </div>
         `;
         
-        // 完全替换：隐藏测试界面，结果容器显示并填充内容
         testContainer.style.display = "none";
         resultContainerDiv.style.display = "block";
         resultContainerDiv.innerHTML = resultHTML;
         
-        // 绑定重新测试按钮事件 (重新显示测试界面并重置)
         const retryBtn = document.getElementById("retryBtnFromResult");
         if(retryBtn) {
             retryBtn.addEventListener("click", () => {
-                // 重置所有答案
                 answers.fill(null);
-                // 重新渲染题目界面
                 renderQuestions();
                 updateStats();
-                // 切换显示
                 testContainer.style.display = "block";
                 resultContainerDiv.style.display = "none";
                 resultContainerDiv.innerHTML = "";
-                // 滚动至顶部
                 document.querySelector('.test-container')?.scrollIntoView({ behavior: "smooth", block: "start" });
             });
         }
@@ -491,7 +536,6 @@
             `;
         });
         questionsArea.innerHTML = html;
-        // 绑定点击事件
         document.querySelectorAll('.opt-btn').forEach(btn => {
             btn.removeEventListener('click', handleClick);
             btn.addEventListener('click', handleClick);
@@ -517,13 +561,11 @@
         updateStats();
     }
 
-    // 重置所有 (保留在测试界面内重置)
     function resetTest() {
         answers.fill(null);
         renderQuestions();
         updateStats();
         questionsArea.scrollTop = 0;
-        // 如果结果容器正在显示，但重置时一般是从结果按钮触发，已经单独处理，这里兼容测试区内重置
         if(testContainer.style.display === "none") {
             testContainer.style.display = "block";
             resultContainerDiv.style.display = "none";
@@ -531,7 +573,6 @@
         }
     }
 
-    // 检查未答题并展示结果 (刷新界面仅结果)
     function checkAndShowResult() {
         const unanswered = answers.filter(a => a === null).length;
         if(unanswered > 0){
@@ -549,7 +590,6 @@
         });
     }
 
-    // 初始化
     function init() {
         renderQuestions();
         resetBtn.addEventListener('click', resetTest);
