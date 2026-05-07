@@ -2,8 +2,8 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>在线答题测试 | 知识挑战</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>yuti · 玉石心测 | 发现你的本命玉石</title>
     <style>
         * {
             margin: 0;
@@ -12,686 +12,549 @@
         }
 
         body {
-            background: linear-gradient(145deg, #f5f7fc 0%, #eef2f5 100%);
-            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-            padding: 2rem 1.5rem;
+            background: linear-gradient(145deg, #f1f7ef 0%, #e2e6db 100%);
+            font-family: 'Segoe UI', 'Noto Sans CJK SC', Roboto, 'Helvetica Neue', sans-serif;
+            padding: 1.5rem 1rem;
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            transition: all 0.2s;
         }
 
-        /* 主卡片容器 */
-        .quiz-container {
-            max-width: 950px;
-            width: 100%;
+        /* 主容器 */
+        .test-container {
+            max-width: 980px;
             margin: 0 auto;
-            background: #ffffff;
+            background: #ffffffea;
             border-radius: 2rem;
-            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.25), 0 8px 18px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 25px 40px -12px rgba(60, 45, 30, 0.3);
             overflow: hidden;
-            transition: all 0.2s ease;
+            border: 1px solid #e2d9cf;
+            transition: all 0.3s ease;
         }
 
         /* 头部区域 */
-        .quiz-header {
-            background: #1f2b3c;
-            color: white;
-            padding: 1.5rem 2rem;
-            border-bottom: 5px solid #ffb347;
+        .hero {
+            background: #2d3e2b;
+            background-image: radial-gradient(circle at 10% 20%, #3f5a38, #1e2a1c);
+            color: #fef3d6;
+            padding: 1.8rem 1.8rem;
+            text-align: center;
         }
-
-        .quiz-header h1 {
-            font-size: 1.9rem;
-            font-weight: 700;
-            letter-spacing: -0.3px;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
+        .hero h1 {
+            font-size: 2.3rem;
+            letter-spacing: 4px;
+            font-weight: 600;
+            text-shadow: 2px 2px 2px rgba(0,0,0,0.2);
         }
-
-        .quiz-header h1:before {
-            content: "📋";
-            font-size: 2rem;
-        }
-
-        .quiz-header p {
-            margin-top: 0.6rem;
+        .hero p {
             opacity: 0.85;
-            font-size: 0.95rem;
-        }
-
-        /* 进度&得分栏 */
-        .stats-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            background: #f8fafd;
-            padding: 0.9rem 2rem;
-            border-bottom: 1px solid #e2e8f0;
-            font-weight: 600;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .question-counter {
-            background: #e9edf2;
-            padding: 0.3rem 1rem;
-            border-radius: 40px;
             font-size: 0.9rem;
-            color: #1f2b3c;
+            margin-top: 0.3rem;
         }
-
-        .score-area {
-            background: #ffecce;
-            padding: 0.3rem 1rem;
+        .rule-badge {
+            background: #cbb87b;
+            color: #1f2b1c;
+            display: inline-block;
+            padding: 0.25rem 1rem;
             border-radius: 40px;
-            color: #b45f1b;
-            font-size: 1rem;
+            font-size: 0.7rem;
+            font-weight: bold;
+            margin-top: 0.7rem;
         }
 
-        .score-area span {
-            font-size: 1.3rem;
-            font-weight: 800;
-            color: #e67e22;
-        }
-
-        /* 题目区域 */
-        .question-area {
-            padding: 2rem 2rem 1rem 2rem;
-        }
-
-        .question-text {
-            font-size: 1.6rem;
-            font-weight: 600;
-            line-height: 1.35;
-            color: #0a1c2f;
-            margin-bottom: 2rem;
-            border-left: 5px solid #ffb347;
-            padding-left: 1.2rem;
-        }
-
-        /* 选项列表 (网格布局更好看) */
-        .options-list {
+        /* 统计栏 */
+        .stats-panel {
+            background: #fefaf0;
+            border-bottom: 1px solid #e2d7c6;
+            padding: 0.7rem 1.5rem;
             display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .option-item {
-            background: #f9fbfd;
-            border: 2px solid #e2edf7;
-            border-radius: 1.2rem;
-            transition: all 0.2s;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            padding: 0.9rem 1.2rem;
-        }
-
-        .option-item:hover {
-            background: #f1f7fe;
-            border-color: #ffb347;
-            transform: translateX(4px);
-        }
-
-        /* 单选圆圈自定义 */
-        .option-radio {
-            appearance: none;
-            -webkit-appearance: none;
-            width: 22px;
-            height: 22px;
-            border: 2px solid #bdd4e7;
-            border-radius: 50%;
-            margin-right: 1rem;
-            position: relative;
-            cursor: pointer;
-            background: white;
-            flex-shrink: 0;
-            transition: 0.1s;
-        }
-
-        .option-radio:checked {
-            border-color: #e67e22;
-            background-color: #e67e22;
-            box-shadow: inset 0 0 0 4px white;
-        }
-
-        .option-radio:focus {
-            outline: none;
-        }
-
-        .option-text {
-            font-size: 1.05rem;
-            font-weight: 500;
-            color: #1e2f3e;
-            line-height: 1.4;
-            flex: 1;
-        }
-
-        /* 按钮区域 */
-        .action-buttons {
-            padding: 0.5rem 2rem 2rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            gap: 1rem;
             flex-wrap: wrap;
-        }
-
-        button {
-            background: #1f2b3c;
-            border: none;
-            padding: 0.8rem 1.6rem;
-            border-radius: 3rem;
-            font-weight: 600;
-            font-size: 0.95rem;
-            color: white;
-            cursor: pointer;
-            transition: 0.2s;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-            display: inline-flex;
+            justify-content: space-between;
             align-items: center;
             gap: 8px;
         }
-
-        button i {
-            font-style: normal;
-            font-weight: normal;
+        .progress {
+            background: #e5dfcf;
+            padding: 0.25rem 1rem;
+            border-radius: 40px;
+            font-weight: 600;
+            color: #3a2c1f;
         }
-
-        button:hover:not(:disabled) {
-            background: #ff8c1a;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 18px rgba(230, 126, 34, 0.2);
-        }
-
-        button:active {
-            transform: translateY(1px);
-        }
-
-        button:disabled {
-            background: #b9c2cc;
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
-
-        .reset-btn {
-            background: #5c6f87;
-        }
-
-        .reset-btn:hover:not(:disabled) {
-            background: #3c4b62;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .next-btn {
-            background: #e67e22;
-            padding: 0.8rem 2rem;
-        }
-
-        .submit-area {
+        .option-stats {
             display: flex;
-            justify-content: center;
-            margin-top: 10px;
+            flex-wrap: wrap;
+            gap: 0.7rem;
+            background: #ffffffcc;
+            padding: 0.2rem 1rem;
+            border-radius: 40px;
         }
+        .stat-a { color: #2c6e2c; }
+        .stat-b { color: #b88746; }
+        .stat-c { color: #b5651e; }
+        .stat-d { color: #8b5a2b; }
+        .stat-null { color: #9e8d77; }
 
-        .submit-btn {
-            background: #27ae60;
-            font-size: 1rem;
-            padding: 0.9rem 2rem;
+        /* 滚动题目区域 */
+        .questions-area {
+            padding: 1.8rem 1.8rem 1rem;
+            max-height: 65vh;
+            overflow-y: auto;
+            scroll-behavior: smooth;
         }
-
-        .submit-btn:hover:not(:disabled) {
-            background: #2ecc71;
-        }
-
-        /* 结果卡牌 */
-        .result-card {
-            margin: 1rem 2rem 2rem 2rem;
-            background: #eef6ef;
+        .question-card {
+            background: #fffff7;
+            border: 1px solid #ece2d4;
             border-radius: 1.5rem;
-            padding: 1.2rem 1.8rem;
-            border-left: 8px solid #2ecc71;
-            animation: fadeSlideUp 0.3s ease;
+            padding: 1.2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+            transition: all 0.2s;
         }
-
-        .result-card h3 {
-            color: #1f6e43;
-            margin-bottom: 0.5rem;
-            font-size: 1.3rem;
+        .question-card:hover {
+            border-color: #cbb87b;
+            box-shadow: 0 8px 18px rgba(100, 70, 30, 0.08);
         }
-
-        .result-card p {
+        .q-title {
+            font-weight: 700;
             font-size: 1rem;
-            color: #2c5a2e;
+            margin-bottom: 0.9rem;
+            color: #3a2a1e;
+        }
+        .options-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.7rem;
+            margin-top: 0.3rem;
+        }
+        .opt-btn {
+            flex: 1 0 100px;
+            background: #fef9f0;
+            border: 1px solid #e2cfb5;
+            border-radius: 2rem;
+            padding: 0.6rem 0.6rem;
+            text-align: center;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.85rem;
+            color: #5a3e28;
+        }
+        .opt-btn:hover {
+            background: #f5e7d3;
+            border-color: #b88b4a;
+            transform: translateY(-1px);
+        }
+        .opt-active {
+            background: #5f7c4b;
+            border-color: #3e5d2a;
+            color: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
-        .result-detail {
+        .action-bar {
+            padding: 1rem 1.8rem 1.8rem;
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+            background: #ffffff;
+            border-top: 1px solid #efe3d2;
+        }
+        button {
+            border: none;
+            padding: 0.7rem 1.6rem;
+            border-radius: 3rem;
+            font-weight: 600;
             font-size: 0.9rem;
-            margin-top: 10px;
-            color: #2d4a22;
-            background: white;
-            padding: 0.7rem;
-            border-radius: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            background: #eae1d1;
+            color: #3c2a1b;
         }
-
-        @keyframes fadeSlideUp {
-            from {
-                opacity: 0;
-                transform: translateY(12px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .btn-primary {
+            background: #b27d40;
+            color: white;
+            box-shadow: 0 4px 8px rgba(140, 90, 30, 0.2);
         }
-
-        /* 移动端优化 */
-        @media (max-width: 600px) {
-            body {
-                padding: 1rem;
-            }
-            .question-text {
-                font-size: 1.3rem;
-            }
-            .option-text {
-                font-size: 0.95rem;
-            }
-            .action-buttons {
-                padding: 0.5rem 1.2rem 1.8rem 1.2rem;
-            }
-            .question-area {
-                padding: 1.5rem 1.2rem;
-            }
+        .btn-primary:hover {
+            background: #c9944e;
+            transform: translateY(-2px);
         }
-
+        
+        /* 独立结果页面样式 (全屏只显示结果) */
+        .result-only {
+            max-width: 780px;
+            margin: 2rem auto;
+        }
+        .result-card {
+            background: linear-gradient(115deg, #fff9ef, #fff6e8);
+            border-radius: 2rem;
+            padding: 2rem 1.8rem;
+            border-left: 8px solid #c7a252;
+            box-shadow: 0 20px 35px -10px rgba(0,0,0,0.2);
+        }
+        .jade-badge {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: #2e5c2a;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: #e5e0c3;
+            padding: 0.3rem 1.5rem;
+            border-radius: 60px;
+            margin-bottom: 1rem;
+        }
+        .jade-image {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            background: #f2e8d5;
+        }
+        .dimension-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin: 1.2rem 0;
+        }
+        .dim-item {
+            background: #f5efdf;
+            border-radius: 2rem;
+            padding: 0.3rem 1.2rem;
+            font-size: 0.85rem;
+        }
+        .retry-btn {
+            background: #b27d40;
+            color: white;
+            margin-top: 1.5rem;
+            display: inline-block;
+        }
         footer {
             text-align: center;
-            font-size: 0.75rem;
-            padding: 1rem 0 1rem 0;
-            color: #8ba0b5;
-            border-top: 1px solid #eef2f5;
-            margin-top: 0.5rem;
+            font-size: 0.7rem;
+            padding: 1rem;
+            color: #9e8a6e;
+            border-top: 1px solid #efeadb;
+        }
+        .hide {
+            display: none !important;
+        }
+        @media (max-width: 650px) {
+            .questions-area { padding: 1rem; }
+            .opt-btn { flex: 1 0 75px; font-size: 0.75rem; }
+            .jade-badge { font-size: 1.4rem; }
+            .jade-image { width: 44px; height: 44px; }
         }
     </style>
 </head>
 <body>
+<div id="app">
+    <!-- 主测试界面容器 (包含题目、统计等) -->
+    <div id="testContainer" class="test-container">
+        <div class="hero">
+            <h1>🌿 yuti · 玉石心鉴</h1>
+            <p>20题洞见内在气质 · 找到与你共鸣的灵玉</p>
+        </div>
 
-<div class="quiz-container" id="quizApp">
-    <div class="quiz-header">
-        <h1>知识挑战 · 答题闯关</h1>
-        <p>每题只有一个正确答案，答完可查看总分与反馈</p>
+        <div class="stats-panel">
+            <div class="progress">📜 进度: <span id="answeredCount">0</span> / <span id="totalCountSpan">20</span> 题</div>
+            <div class="option-stats">
+                <span class="stat-a" id="statA"> A:0</span>
+                <span class="stat-b" id="statB"> B:0</span>
+                <span class="stat-c" id="statC"> C:0</span>
+                <span class="stat-d" id="statD"> D:0</span>
+                <span class="stat-null" id="statNull">⚪ 未选:0</span>
+            </div>
+        </div>
+
+        <div class="questions-area" id="questionsArea"></div>
+
+        <div class="action-bar">
+            <button id="resetBtn">🔄 重新测试</button>
+            <button id="viewResultBtn" class="btn-primary">✨ 探寻本命玉石 ✨</button>
+        </div>
     </div>
 
-    <div class="stats-bar">
-        <div class="question-counter" id="counterDisplay">第1 / 5题</div>
-        <div class="score-area">🏆 当前得分: <span id="currentScoreSpan">0</span> / <span id="totalScoreSpan">5</span></div>
-    </div>
-
-    <div class="question-area" id="questionArea">
-        <div class="question-text" id="questionText">加载题目中...</div>
-        <div class="options-list" id="optionsContainer"></div>
-    </div>
-
-    <div class="action-buttons">
-        <button class="reset-btn" id="resetBtn">⟳ 重新答题</button>
-        <button class="next-btn" id="nextBtn">下一题 →</button>
-    </div>
-
-    <div id="submitBtnContainer" class="submit-area">
-        <!-- 最后一题时动态展示提交按钮或正常的下一题逻辑 -->
-    </div>
-    <div id="resultArea"></div>
-    <footer>📌 共5题 | 点击选项即可选中答案，所有题目完成后自动计算总分</footer>
+    <!-- 独立结果容器 (初始为空且隐藏样式由单独管理) -->
+    <div id="resultContainer" style="display: none;"></div>
 </div>
 
 <script>
-    // ---------- 题库 ----------
-    const QUIZ_DATA = [
-        {
-            text: "1. 下列哪个是 JavaScript 中声明变量的正确方式？",
-            options: ["var name;", "let name;", "const name;", "以上都是"],
-            correct: 3   // 索引从0开始，对应 "以上都是"
-        },
-        {
-            text: "2. 在 HTML 中，哪个标签用于引入外部 JavaScript 文件？",
-            options: ["<js>", "<script>", "<javascript>", "<code>"],
-            correct: 1   // <script>
-        },
-        {
-            text: "3. 以下哪个 CSS 属性可以更改文本颜色？",
-            options: ["text-color", "color", "font-color", "bgcolor"],
-            correct: 1   // color
-        },
-        {
-            text: "4. 以下哪个是 Git 版本控制系统托管平台（可用于 GitHub Pages）？",
-            options: ["GitLab", "Bitbucket", "GitHub", "以上都是"],
-            correct: 3   // 以上都是
-        },
-        {
-            text: "5. 想在 GitHub Pages 上展示一个自定义域名，需要在仓库根目录放置什么文件？",
-            options: ["CNAME", "DOMAIN", "config.yml", "index.html"],
-            correct: 0   // CNAME 文件
-        }
+    // ---------- 20道题库 (完全匹配规则，维度内置用于计分) ----------
+    const QUESTIONS = [
+        { text: "参加完一场热闹的聚会后，你通常的感觉是？", options: ["非常兴奋，还想继续社交", "比较开心，但有点累", "有点消耗，需要独处一下", "很疲惫，希望尽快一个人待着"], dim: "EI", sA:2, sB:1, sC:-1, sD:-2 },
+        { text: "在项目团队讨论中，你更常扮演的角色是？", options: ["主动发言，带动气氛", "会发言，但不算最多", "多数时间在听，偶尔插话", "几乎只听不说"], dim: "EI", sA:2, sB:1, sC:-1, sD:-2 },
+        { text: "空闲时间，你更喜欢？", options: ["和朋友出去玩", "一两好友小聚", "一个人做喜欢的事", "完全独处，不被打扰"], dim: "EI", sA:2, sB:1, sC:-1, sD:-2 },
+        { text: "面对新布置的选修课期末作业，你通常？", options: ["马上开始行动，边做边想", "边做边调整", "想清楚方向再开始", "必须全部想清楚才行动"], dim: "EI", sA:2, sB:1, sC:-1, sD:-2 },
+        { text: "别人对你的评价更接近？", options: ["热情开朗", "比较健谈", "安静沉稳", "冷淡内敛"], dim: "EI", sA:2, sB:1, sC:-1, sD:-2 },
+        { text: "上选修课时，你看重授课内容中的？", options: ["具体数据和事实", "可验证的细节", "背后的含义与趋势", "抽象的可能性和灵感"], dim: "SN", sA:2, sB:1, sC:-1, sD:-2 },
+        { text: "你更喜欢哪种类型的小说/电影？", options: ["真实事件改编", "现实题材", "科幻或奇幻", "抽象、隐喻强烈的作品"], dim: "SN", sA:2, sB:1, sC:-1, sD:-2 },
+        { text: "学习了如何判断玉石好坏时，你更偏好？", options: ["按标准步骤操作", "示例和模板", "理解原理后再实践", "自由探索和试错"], dim: "SN", sA:2, sB:1, sC:-1, sD:-2 },
+        { text: "你容易被什么样的玉吸引？", options: ["朴素典雅的玉", "盘出包浆的玉", "颜色奇异的玉", "独具特色的玉"], dim: "SN", sA:2, sB:1, sC:-1, sD:-2 },
+        { text: "你对“明天”的态度更接近？", options: ["把今天的事做好就行", "按已知规律推测明天", "经常想象未来的可能性", "觉得未来充满未知与创造空间"], dim: "SN", sA:2, sB:1, sC:-1, sD:-2 },
+        { text: "当你和朋友发生冲突时，你更在意？", options: ["谁对谁错", "逻辑和道理", "对方的感受", "关系的和谐"], dim: "TF", sA:2, sB:1, sC:-1, sD:-2 },
+        { text: "假如你在买玉，你更容易被什么样的话说服？", options: ["逻辑严密的论证", "客观事实数据", "真诚的个人经历分享", "对方基于自己的判断"], dim: "TF", sA:2, sB:1, sC:-1, sD:-2 },
+        { text: "做重要决定时，你更依赖？", options: ["冷静分析利弊", "客观规则与标准", "内心感觉和价值观", "身边人的感受"], dim: "TF", sA:2, sB:1, sC:-1, sD:-2 },
+        { text: "你更容易被描述为？", options: ["理性冷静", "公正讲原则", "温暖体贴", "感性心软"], dim: "TF", sA:2, sB:1, sC:-1, sD:-2 },
+        { text: "你认为规则应该？", options: ["严格统一执行", "尽量保持逻辑一致", "根据人情适当调整", "完全因人因事而变"], dim: "TF", sA:2, sB:1, sC:-1, sD:-2 },
+        { text: "对一个即将到来的旅行，你通常？", options: ["详细计划到每一天", "设定大概框架", "只定大方向，细节随意", "完全不计划，走到哪是哪"], dim: "JP", sA:2, sB:1, sC:-1, sD:-2 },
+        { text: "你的桌面或工作空间通常是？", options: ["非常整齐，分类明确", "基本整洁", "有点乱但不影响找东西", "很乱但自己知道在哪"], dim: "JP", sA:2, sB:1, sC:-1, sD:-2 },
+        { text: "面对大作业截止日期，你更常？", options: ["提前很早完成", "按计划逐步推进", "最后几天集中完成", "最后一天才开始"], dim: "JP", sA:2, sB:1, sC:-1, sD:-2 },
+        { text: "你更喜欢？", options: ["事情尽早定下来", "有明确的结论", "留有余地和弹性", "尽可能保持开放选择"], dim: "JP", sA:2, sB:1, sC:-1, sD:-2 },
+        { text: "别人可能评价你？", options: ["过于刻板/固执", "太讲规矩", "太随性/不靠谱", "太过散漫"], dim: "JP", sA:2, sB:1, sC:-1, sD:-2 }
     ];
 
-    const TOTAL_QS = QUIZ_DATA.length;
+    const TOTAL = QUESTIONS.length;
+    let answers = new Array(TOTAL).fill(null);
 
-    // 应用状态
-    let currentIndex = 0;               // 当前第几题 (0索引)
-    let userAnswers = new Array(TOTAL_QS).fill(null);   // 存储每道题选中的选项索引，初始null表示未选
-    let quizFinished = false;            // 是否已经提交/完成所有题目(显示成绩界面)
-    
     // DOM 元素
-    const questionTextEl = document.getElementById("questionText");
-    const optionsContainer = document.getElementById("optionsContainer");
-    const counterDisplay = document.getElementById("counterDisplay");
-    const currentScoreSpan = document.getElementById("currentScoreSpan");
-    const totalScoreSpan = document.getElementById("totalScoreSpan");
-    const nextBtn = document.getElementById("nextBtn");
+    const testContainer = document.getElementById("testContainer");
+    const resultContainerDiv = document.getElementById("resultContainer");
+    const questionsArea = document.getElementById("questionsArea");
+    const answeredSpan = document.getElementById("answeredCount");
+    const totalSpan = document.getElementById("totalCountSpan");
     const resetBtn = document.getElementById("resetBtn");
-    const submitBtnContainer = document.getElementById("submitBtnContainer");
-    const resultArea = document.getElementById("resultArea");
+    const viewBtn = document.getElementById("viewResultBtn");
+    
+    totalSpan.innerText = TOTAL;
 
-    // 辅助函数 : 计算当前得分
-    function computeCurrentScore() {
-        let score = 0;
-        for (let i = 0; i < TOTAL_QS; i++) {
-            if (userAnswers[i] !== null && userAnswers[i] === QUIZ_DATA[i].correct) {
-                score++;
+    // 更新统计栏 (选项计数 + 进度)
+    function updateStats() {
+        let answered = 0, aC=0,bC=0,cC=0,dC=0;
+        for(let i=0;i<TOTAL;i++){
+            const v = answers[i];
+            if(v!==null){
+                answered++;
+                if(v===0) aC++;
+                else if(v===1) bC++;
+                else if(v===2) cC++;
+                else if(v===3) dC++;
             }
         }
-        return score;
+        answeredSpan.innerText = answered;
+        document.getElementById("statA").innerHTML = `🌱 A:${aC}`;
+        document.getElementById("statB").innerHTML = `🍂 B:${bC}`;
+        document.getElementById("statC").innerHTML = `🍁 C:${cC}`;
+        document.getElementById("statD").innerHTML = `🪨 D:${dC}`;
+        document.getElementById("statNull").innerHTML = `⚪ 未选:${TOTAL-answered}`;
     }
 
-    // 更新头部得分显示
-    function updateScoreDisplay() {
-        const currentScore = computeCurrentScore();
-        currentScoreSpan.innerText = currentScore;
-        totalScoreSpan.innerText = TOTAL_QS;
+    // 四维度分数计算
+    function computeDimScores() {
+        let scores = { EI:0, SN:0, TF:0, JP:0 };
+        for(let i=0;i<TOTAL;i++){
+            const ans = answers[i];
+            if(ans === null) continue;
+            const q = QUESTIONS[i];
+            let point = 0;
+            if(ans===0) point = q.sA;
+            else if(ans===1) point = q.sB;
+            else if(ans===2) point = q.sC;
+            else point = q.sD;
+            if(q.dim === "EI") scores.EI += point;
+            else if(q.dim === "SN") scores.SN += point;
+            else if(q.dim === "TF") scores.TF += point;
+            else scores.JP += point;
+        }
+        return scores;
     }
 
-    // 渲染当前题目 (根据 currentIndex)
-    function renderCurrentQuestion() {
-        if (quizFinished) {
-            // 如果已经完成所有答题并显示结果，不再渲染题目区域
-            return;
-        }
-        const question = QUIZ_DATA[currentIndex];
-        if (!question) return;
-        
-        // 设置题目文本
-        questionTextEl.innerText = question.text;
-        
-        // 生成选项html
-        const optionsHtml = question.options.map((opt, idx) => {
-            const isChecked = (userAnswers[currentIndex] === idx);
-            const checkedAttr = isChecked ? 'checked' : '';
-            // 为了保证每组radio互斥，name用当前题目索引
-            return `
-                <label class="option-item" data-opt-index="${idx}">
-                    <input type="radio" name="q${currentIndex}" value="${idx}" class="option-radio" ${checkedAttr}>
-                    <span class="option-text">${escapeHtml(opt)}</span>
-                </label>
-            `;
-        }).join('');
-        
-        optionsContainer.innerHTML = optionsHtml;
-        
-        // 绑定每个选项的change事件 (通过事件委托或者单独绑定，这里用委托方式)
-        // 为了避免重复绑定，我们直接在容器上监听change事件
-        // 注意: 下面会统一挂载事件,但要先移除旧监听避免重复? 我们用全局委托即可，重新渲染后事件自然有效。
-        
-        // 更新counter显示
-        counterDisplay.innerText = `第${currentIndex+1} / ${TOTAL_QS}题`;
-        
-        // 更新按钮状态: 下一题按钮样式，判断如果是最后一题则显示"完成并查看结果"，否则显示下一题
-        if (currentIndex === TOTAL_QS - 1) {
-            // 最后一题: 显示“提交答卷”大按钮，并隐藏原来的nextBtn? 但为了UI一致，可以显示一个绿色提交按钮在额外区域，同时隐藏原有的nextBtn区域？
-            // 为了符合直觉：最后一题时，把原来的nextBtn隐藏，在submitBtnContainer中显示"✅ 提交答卷"按钮。
-            nextBtn.style.display = "none";
-            submitBtnContainer.innerHTML = `<button class="submit-btn" id="submitQuizBtn">📝 提交答卷 & 查看成绩</button>`;
-            const submitQuizBtn = document.getElementById("submitQuizBtn");
-            if (submitQuizBtn) {
-                // 移除原有监听防止重复
-                const newSubmitBtn = submitQuizBtn.cloneNode(true);
-                submitQuizBtn.parentNode.replaceChild(newSubmitBtn, submitQuizBtn);
-                newSubmitBtn.addEventListener("click", finishQuizAndShowResult);
-            }
-        } else {
-            // 非最后一题: 显示nextBtn, 清空submit容器
-            nextBtn.style.display = "flex";
-            submitBtnContainer.innerHTML = "";
-        }
-        
-        // 保证重置后没有残留结果区域（如果重置时已经finished，也要清理）
-        if (!quizFinished) {
-            // 如果尚未完成，结果区域应该隐藏或清空，避免混叠
-            if(resultArea.innerHTML !== "") {
-                resultArea.innerHTML = "";
-            }
-        }
-        
-        // 更新得分显示 (每次重绘时得分可能因之前的改动而变)
-        updateScoreDisplay();
+    function getLetterAndStrength(score, first, second){
+        if(score > 0) return { letter: first, strength: getStrength(score) };
+        if(score < 0) return { letter: second, strength: getStrength(-score) };
+        return { letter: "平衡", strength: "无倾向" };
     }
-    
-    // 简单的防XSS
-    function escapeHtml(str) {
-        return str.replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
-        }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
-            return c;
-        });
+    function getStrength(absScore){
+        if(absScore <= 2) return "轻微";
+        if(absScore <= 5) return "中等";
+        return "强烈";
     }
-    
-    // 处理选项更改（监听选项点击/radio变化）
-    function handleOptionChange(event) {
-        if (quizFinished) return; // 答题结束后不允许改动
-        
-        let targetInput = null;
-        if (event.target.classList && event.target.classList.contains('option-radio')) {
-            targetInput = event.target;
-        } else if (event.target.parentElement && event.target.parentElement.querySelector('.option-radio')) {
-            // 可能点击的是label区域
-            const label = event.target.closest('.option-item');
-            if (label) {
-                const radio = label.querySelector('.option-radio');
-                if (radio) targetInput = radio;
-            }
-        }
-        
-        if (!targetInput) return;
-        
-        const selectedValue = parseInt(targetInput.value, 10);
-        if (isNaN(selectedValue)) return;
-        
-        // 保存当前题目所选答案 (索引)
-        const previousAnswer = userAnswers[currentIndex];
-        userAnswers[currentIndex] = selectedValue;
-        
-        // 如果之前答案和现在不同，得分可能改变，需要更新
-        updateScoreDisplay();
-        
-        // 可选: 改变选项样式反馈，已经由radio的checked表现完成。
-        // 由于重新渲染会重新生成，但这里不需要重新渲染整个题目? 为了更好的交互可以只更新radio状态，
-        // 但因为我们已经手动改变了radio的checked属性，并且userAnswers已保存，所以无需重新渲染整个题目避免闪烁。
-        // 但是为了同步UI上的“选中样式”，当前已经通过原生的input更改已经足够。 如果用户通过label点按，上面的操作已经设置radio为选中。
-        // 不过注意因为是直接操作radio，它的checked已经被浏览器标记，不需要额外动作。
-        // 但有一个小问题：如果我们重新渲染了题目，会导致事件丢失，但这里并未重新渲染，直接修改dom是合理的。
-        // 这样交互更流畅。
-        // 确保其他同组radio未选中，因为原生radio自动互斥，好。
+
+    // ---------- 玉石映射 + 对应图片路径  ----------
+    const JADE_IMG_MAP = {
+        "和田玉": "images/hetianyu.png",
+        "翡翠": "images/feicui.png",
+        "青金石": "images/qingjinshi.png",
+        "玛瑙": "images/manao.png",
+        "琥珀": "images/hupo.png",
+        "独山玉": "images/dushanyu.png"
+    };
+
+    function mapToJade(eiLetter, snLetter, tfLetter, jpLetter){
+        const combo = (eiLetter||'') + (snLetter||'') + (tfLetter||'') + (jpLetter||'');
+        const jades = {
+            "和田玉": { desc: "温润内敛，谦谦君子。你像和田玉一样沉稳而富有涵养，含蓄中透着坚定，包容且有原则。", traits: "温和、成熟、平衡、重内涵" },
+            "翡翠": { desc: "翠色阳刚，灵透果决。你拥有翡翠般的锐气与生命力，果断坚韧，同时又懂得审时度势，充满激情与力量。", traits: "果断、敏锐、生机勃勃、敢于突破" },
+            "青金石": { desc: "深邃如星空，理智且深邃。你追求真理与智慧，冷静从容，气质高贵，善于规划并充满洞察力。", traits: "理性、深邃、沉静、有远见" },
+            "玛瑙": { desc: "缤纷坚韧，适应多变。你像玛瑙一样多彩且富有弹性，灵活应对变化，兼具感性与务实，温暖又通达。", traits: "灵活、包容、务实、善社交" },
+            "琥珀": { desc: "温暖怀旧，富有共情力。你如琥珀般温润亲和，珍视情感，能给人带来安定感，内心蕴藏古老智慧。", traits: "温暖、细腻、重情义、治愈" },
+            "独山玉": { desc: "质朴有力，刚柔并济。你兼具实用主义与创造精神，低调却蕴含力量，能于平凡中造就非凡。", traits: "坚韧、务实、创造、接地气" }
+        };
+        if(combo === "ESTJ" || combo === "ENTJ" || combo === "ISTJ") return { jade: "翡翠", ...jades["翡翠"] };
+        if(combo === "INTJ" || combo === "INTP" || combo === "ENTP") return { jade: "青金石", ...jades["青金石"] };
+        if(combo === "ENFJ" || combo === "ENFP" || combo === "ESFJ") return { jade: "琥珀", ...jades["琥珀"] };
+        if(combo === "ISFP" || combo === "INFP" || combo === "INFJ") return { jade: "独山玉", ...jades["独山玉"] };
+        if(combo === "ESTP" || combo === "ESFP" || combo === "ISTP") return { jade: "玛瑙", ...jades["玛瑙"] };
+        return { jade: "和田玉", ...jades["和田玉"] };
     }
-    
-    // 切换下一题
-    function goToNextQuestion() {
-        if (quizFinished) return;
-        // 检查当前题目是否已经作答，若未作答，给出轻提示但不强制阻塞？用户体验上也可以允许跳过，但最好提示一下
-        if (userAnswers[currentIndex] === null) {
-            // 小小提醒但不强制拦截，更友好，但也可以提示. 我们加一个非阻塞提醒
-            const reminder = document.createElement("div");
-            reminder.textContent = "⚠️ 当前题目未作答，可以留空继续，但无法得分哟";
-            reminder.style.cssText = "color:#e67e22; background:#fff3e0; padding:8px 16px; border-radius:40px; margin-bottom:12px; text-align:center; font-size:0.85rem;";
-            const existingReminder = document.querySelector(".temp-reminder");
-            if(existingReminder) existingReminder.remove();
-            reminder.classList.add("temp-reminder");
-            optionsContainer.parentNode.insertBefore(reminder, optionsContainer.nextSibling);
-            setTimeout(() => {
-                if(reminder && reminder.remove) reminder.remove();
-            }, 1800);
-        }
+
+    // 刷新界面仅显示结果 (隐藏整个测试容器，在resultContainer中展示最终卡片)
+    function showResultOnly() {
+        // 计算得分、倾向
+        const scores = computeDimScores();
+        const ei = getLetterAndStrength(scores.EI, "E", "I");
+        const sn = getLetterAndStrength(scores.SN, "S", "N");
+        const tf = getLetterAndStrength(scores.TF, "T", "F");
+        const jp = getLetterAndStrength(scores.JP, "J", "P");
         
-        if (currentIndex + 1 < TOTAL_QS) {
-            currentIndex++;
-            renderCurrentQuestion();
-        } else {
-            // 理论上已经不会触发，因为最后一题按钮被替换了，但防止边界
-            if(currentIndex === TOTAL_QS-1) {
-                finishQuizAndShowResult();
-            }
-        }
-    }
-    
-    // 完成全部题目并展示结果 (最终结算)
-    function finishQuizAndShowResult() {
-        if (quizFinished) return;
+        let typeRaw = "";
+        typeRaw += (ei.letter === "平衡" ? "X" : ei.letter);
+        typeRaw += (sn.letter === "平衡" ? "X" : sn.letter);
+        typeRaw += (tf.letter === "平衡" ? "X" : tf.letter);
+        typeRaw += (jp.letter === "平衡" ? "X" : jp.letter);
+        let displayType = typeRaw;
         
-        // 检查是否所有题目都已答？ 可能有些题目未选，但不强制，未选的自动算错。
-        // 计算最终得分
-        const finalScore = computeCurrentScore();
-        const percentage = Math.round((finalScore / TOTAL_QS) * 100);
+        const jadeResult = mapToJade(ei.letter==="平衡"?null:ei.letter, sn.letter==="平衡"?null:sn.letter, tf.letter==="平衡"?null:tf.letter, jp.letter==="平衡"?null:jp.letter);
+        const jadeImgSrc = JADE_IMG_MAP[jadeResult.jade] || "https://placehold.co/200x200?text=灵石";
         
-        // 构建详细答题反馈列表
-        let detailsHtml = `<div class="result-detail"><strong>📖 详细解析：</strong><ul style="margin-top:8px; list-style-type: none; padding-left: 0;">`;
-        for (let i = 0; i < TOTAL_QS; i++) {
-            const q = QUIZ_DATA[i];
-            const userChoice = userAnswers[i];
-            const isCorrect = (userChoice !== null && userChoice === q.correct);
-            const correctAnswerText = q.options[q.correct];
-            const userAnswerText = (userChoice !== null) ? q.options[userChoice] : "未作答";
-            const statusIcon = isCorrect ? "✅" : "❌";
-            detailsHtml += `
-                <li style="margin-bottom: 12px; border-bottom: 1px solid #e0ddc0; padding-bottom: 6px;">
-                    <span style="font-weight:600;">${statusIcon} ${escapeHtml(q.text)}</span><br>
-                    <span style="font-size: 0.85rem;">&nbsp;&nbsp;你的答案: ${escapeHtml(userAnswerText)} &nbsp; | &nbsp;正确答案: ${escapeHtml(correctAnswerText)}</span>
-                </li>
-            `;
-        }
-        detailsHtml += `</ul></div>`;
-        
-        let message = "";
-        let emoji = "";
-        if (finalScore === TOTAL_QS) {
-            message = "完美满分！ 知识达人就是你 🎉🎉🎉";
-            emoji = "🏅";
-        } else if (finalScore >= TOTAL_QS-2) {
-            message = "成绩优秀！ 再巩固一下就是大神啦 🌟";
-            emoji = "📚";
-        } else if (finalScore >= TOTAL_QS/2) {
-            message = "还不错哟，再复习一次冲击高分 💪";
-            emoji = "✨";
-        } else {
-            message = "再接再厉！多练习会越来越强 🚀";
-            emoji = "🌱";
-        }
-        
-        const resultHtml = `
-            <div class="result-card">
-                <h3>${emoji} 答题完成！ ${message}</h3>
-                <p>🎯 最终得分：${finalScore} / ${TOTAL_QS}  &nbsp;&nbsp; (正确率 ${percentage}%)</p>
-                ${detailsHtml}
-                <p style="margin-top: 12px; font-style:italic;">⭐ 点击「重新答题」可再次挑战~</p>
+        // 构建独立结果卡片HTML
+        const resultHTML = `
+            <div class="result-card" style="max-width: 780px; margin: 0 auto;">
+                <div style="display: flex; align-items: center; flex-wrap: wrap; justify-content: space-between; gap: 12px;">
+                    <div class="jade-badge">
+                        <img class="jade-image" src="${jadeImgSrc}" alt="${jadeResult.jade}" onerror="this.src='https://placehold.co/200x200?text=玉石'">
+                        <span>💎 ${jadeResult.jade}</span>
+                    </div>
+                    <span style="background:#ddd0b0; border-radius:30px; padding:4px 16px; font-size:0.8rem;">⚡ 气质组合 · ${displayType}</span>
+                </div>
+                <div class="dimension-row">
+                    <div class="dim-item">🌊 内外向: ${ei.letter} (${scores.EI}分 · ${ei.strength})</div>
+                    <div class="dim-item">🌿 感知模式: ${sn.letter} (${scores.SN}分 · ${sn.strength})</div>
+                    <div class="dim-item">🔥 决策风格: ${tf.letter} (${scores.TF}分 · ${tf.strength})</div>
+                    <div class="dim-item">📐 生活态度: ${jp.letter} (${scores.JP}分 · ${jp.strength})</div>
+                </div>
+                <hr style="background:#e1d3bd; margin:12px 0;">
+                <p style="font-size:1.1rem; font-weight:500;">✨ 玉石寄语 ✨</p>
+                <p style="margin-top:8px; line-height:1.5;">${jadeResult.desc}</p>
+                <p style="margin-top:16px; background:#ebdfc9; border-radius:30px; padding:6px 16px; display:inline-block;">🍃 核心气质 · ${jadeResult.traits}</p>
+                <div style="margin-top: 28px; text-align: center;">
+                    <button id="retryBtnFromResult" class="btn-primary retry-btn" style="background: #5f7c4b;">🔄 重新测试</button>
+                </div>
+                <p style="margin-top: 20px; font-size:0.7rem; color:#8f7652; text-align:center;">※ 总分>0取首字母，<0取次字母，强度基于绝对值。玉石映射结合四维组合与心性格局。</p>
             </div>
         `;
         
-        resultArea.innerHTML = resultHtml;
-        quizFinished = true;
+        // 完全替换：隐藏测试界面，结果容器显示并填充内容
+        testContainer.style.display = "none";
+        resultContainerDiv.style.display = "block";
+        resultContainerDiv.innerHTML = resultHTML;
         
-        // 禁用选项点击效果（在事件拦截里已经判断quizFinished为true时忽略改动）
-        // 更改界面按钮外观，同时禁用“下一题/提交”相关按钮, 显示重置按钮可用。
-        nextBtn.style.display = "none";
-        submitBtnContainer.innerHTML = "";   // 清空提交区域
-        // 但我们需要禁用所有radio的修改（通过全局监听，已经通过quizFinished变量阻止了修改userAnswers）
-        // 另外给所有现有的radio添加disabled属性？为了更好的体验，让所有选项不可改
-        const allRadios = document.querySelectorAll('.option-radio');
-        allRadios.forEach(radio => radio.disabled = true);
-        
-        // 同时也要让计数器或得分显示不再变化 (已经定格)
-        // 更新得分显示最后一次 (最终成绩) 原本就正确
-        updateScoreDisplay();
+        // 绑定重新测试按钮事件 (重新显示测试界面并重置)
+        const retryBtn = document.getElementById("retryBtnFromResult");
+        if(retryBtn) {
+            retryBtn.addEventListener("click", () => {
+                // 重置所有答案
+                answers.fill(null);
+                // 重新渲染题目界面
+                renderQuestions();
+                updateStats();
+                // 切换显示
+                testContainer.style.display = "block";
+                resultContainerDiv.style.display = "none";
+                resultContainerDiv.innerHTML = "";
+                // 滚动至顶部
+                document.querySelector('.test-container')?.scrollIntoView({ behavior: "smooth", block: "start" });
+            });
+        }
     }
-    
-    // 重置整个测验
-    function resetQuiz() {
-        // 重置状态
-        currentIndex = 0;
-        userAnswers = new Array(TOTAL_QS).fill(null);
-        quizFinished = false;
-        
-        // 清除结果显示区域
-        resultArea.innerHTML = "";
-        
-        // 重新渲染第一题
-        renderCurrentQuestion();
-        
-        // 确保所有选项之前可能被禁用，重新渲染后全部恢复可交互
-        // 同时确保得分显示重置
-        updateScoreDisplay();
-        
-        // 额外确保nextBtn显示正确 (因为reset时可能当前在最后一题状态重置), renderCurrentQuestion内部已处理按钮显示
-        // 但是如果有全局禁用radio的情况, 重新渲染会自动生成新的radio, 没有被禁用，完美
-        // 如果之前提交完成后部分radio被禁用，重新渲染后全部刷新为有效的新的radio节点，事件委托仍然有效。
-        // 需要重新绑定事件？由于监听器绑定在父容器上，依然生效，不需要额外操作。
-    }
-    
-    // 初始化事件绑定 (事件委托)
-    function bindGlobalEvents() {
-        // 监听选项变化: 通过容器，change事件
-        optionsContainer.addEventListener("change", function(e) {
-            if (quizFinished) return;
-            if (e.target && e.target.classList.contains('option-radio')) {
-                const selectedVal = parseInt(e.target.value, 10);
-                if (!isNaN(selectedVal)) {
-                    userAnswers[currentIndex] = selectedVal;
-                    updateScoreDisplay();
-                }
-            }
+
+    // 渲染所有题目 (一页滚动)
+    function renderQuestions() {
+        let html = '';
+        QUESTIONS.forEach((q, idx) => {
+            const selectedVal = answers[idx];
+            html += `
+                <div class="question-card" data-qidx="${idx}">
+                    <div class="q-title">
+                        <span>${idx+1}. ${escapeHtml(q.text)}</span>
+                    </div>
+                    <div class="options-row" id="opts-${idx}">
+                        ${q.options.map((opt, optIdx) => {
+                            const letter = String.fromCharCode(65+optIdx);
+                            const active = (selectedVal === optIdx) ? 'opt-active' : '';
+                            return `<div class="opt-btn ${active}" data-q="${idx}" data-opt="${optIdx}">${letter}. ${escapeHtml(opt)}</div>`;
+                        }).join('')}
+                    </div>
+                </div>
+            `;
         });
-        
-        // 为了防止点击标签时也发生双重事件，但change只触发一次，完美。同时我们增强对label点击可视化不会出错。
-        // 另外为了用户点击整个卡片都能选中，增加点击card区域代理
-        optionsContainer.addEventListener("click", function(e) {
-            if (quizFinished) return;
-            const labelItem = e.target.closest('.option-item');
-            if (labelItem && !e.target.classList.contains('option-radio')) {
-                const radio = labelItem.querySelector('.option-radio');
-                if (radio && !radio.checked) {
-                    radio.checked = true;
-                    // 手动触发change事件
-                    const changeEvent = new Event('change', { bubbles: true });
-                    radio.dispatchEvent(changeEvent);
-                }
-            }
+        questionsArea.innerHTML = html;
+        // 绑定点击事件
+        document.querySelectorAll('.opt-btn').forEach(btn => {
+            btn.removeEventListener('click', handleClick);
+            btn.addEventListener('click', handleClick);
         });
-        
-        // 下一题按钮
-        nextBtn.addEventListener("click", goToNextQuestion);
-        // 重置按钮
-        resetBtn.addEventListener("click", resetQuiz);
+        updateStats();
     }
-    
-    // 启动应用
+
+    function handleClick(e) {
+        const btn = e.currentTarget;
+        const qIdx = parseInt(btn.getAttribute('data-q'));
+        const optVal = parseInt(btn.getAttribute('data-opt'));
+        if(isNaN(qIdx) || isNaN(optVal)) return;
+        answers[qIdx] = optVal;
+        const container = document.getElementById(`opts-${qIdx}`);
+        if(container){
+            const btns = container.querySelectorAll('.opt-btn');
+            btns.forEach(b => {
+                let val = parseInt(b.getAttribute('data-opt'));
+                if(val === optVal) b.classList.add('opt-active');
+                else b.classList.remove('opt-active');
+            });
+        }
+        updateStats();
+    }
+
+    // 重置所有 (保留在测试界面内重置)
+    function resetTest() {
+        answers.fill(null);
+        renderQuestions();
+        updateStats();
+        questionsArea.scrollTop = 0;
+        // 如果结果容器正在显示，但重置时一般是从结果按钮触发，已经单独处理，这里兼容测试区内重置
+        if(testContainer.style.display === "none") {
+            testContainer.style.display = "block";
+            resultContainerDiv.style.display = "none";
+            resultContainerDiv.innerHTML = "";
+        }
+    }
+
+    // 检查未答题并展示结果 (刷新界面仅结果)
+    function checkAndShowResult() {
+        const unanswered = answers.filter(a => a === null).length;
+        if(unanswered > 0){
+            if(!confirm(`还有 ${unanswered} 题未选，未选题目不计分可能影响准确性，仍要查看玉石结果吗？`)) return;
+        }
+        showResultOnly();
+    }
+
+    function escapeHtml(str){
+        return str.replace(/[&<>]/g, function(m){
+            if(m === '&') return '&amp;';
+            if(m === '<') return '&lt;';
+            if(m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    // 初始化
     function init() {
-        bindGlobalEvents();
-        renderCurrentQuestion();
-        updateScoreDisplay();
+        renderQuestions();
+        resetBtn.addEventListener('click', resetTest);
+        viewBtn.addEventListener('click', checkAndShowResult);
     }
-    
     init();
 </script>
 </body>
